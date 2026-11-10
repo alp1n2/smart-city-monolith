@@ -1,0 +1,15 @@
+E:\RYBEZ\KURSOVAI\smart-city-main\utility-service\src\main\java\com\example\utility_service\config\CorsConfig.java
+E:\RYBEZ\KURSOVAI\smart-city-main\utility-service\src\main\java\com\example\utility_service\config\GlobalExceptionHandler.java
+E:\RYBEZ\KURSOVAI\smart-city-main\utility-service\src\main\java\com\example\utility_service\config\SecurityConfig.java
+E:\RYBEZ\KURSOVAI\smart-city-main\utility-service\src\main\java\com\example\utility_service\controller\IssueController.java
+E:\RYBEZ\KURSOVAI\smart-city-main\utility-service\src\main\java\com\example\utility_service\dto\CreateIssueRequest.java
+E:\RYBEZ\KURSOVAI\smart-city-main\utility-service\src\main\java\com\example\utility_service\dto\IssueResponse.java
+E:\RYBEZ\KURSOVAI\smart-city-main\utility-service\src\main\java\com\example\utility_service\dto\UpdateIssueStatusRequest.java
+E:\RYBEZ\KURSOVAI\smart-city-main\utility-service\src\main\java\com\example\utility_service\entity\Issue.java
+E:\RYBEZ\KURSOVAI\smart-city-main\utility-service\src\main\java\com\example\utility_service\entity\IssueComment.java
+E:\RYBEZ\KURSOVAI\smart-city-main\utility-service\src\main\java\com\example\utility_service\repository\IssueCommentRepository.java
+E:\RYBEZ\KURSOVAI\smart-city-main\utility-service\src\main\java\com\example\utility_service\repository\IssueRepository.java
+E:\RYBEZ\KURSOVAI\smart-city-main\utility-service\src\main\java\com\example\utility_service\security\JwtFilter.java
+E:\RYBEZ\KURSOVAI\smart-city-main\utility-service\src\main\java\com\example\utility_service\security\JwtUtil.java
+E:\RYBEZ\KURSOVAI\smart-city-main\utility-service\src\main\java\com\example\utility_service\service\IssueService.java
+E:\RYBEZ\KURSOVAI\smart-city-main\utility-service\src\main\java\com\example\utility_service\UtilityServiceApplication.java

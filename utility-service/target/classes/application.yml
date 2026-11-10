@@ -1,0 +1,27 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: utility-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_utility?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&connectionCollation=utf8mb4_unicode_ci
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+jwt:
+  secret: "veryLongSecretKeyForSmartCityProjectAtLeast256BitsLong1234567890"
+
+logging:
+  level:
+    ru.smartcity.utility: DEBUG
