@@ -1,0 +1,28 @@
+server:
+  port: 8085 # Оставляем тот же порт, чтобы клиент (дашборд) работал без изменений
+
+spring:
+  application:
+    name: smart-city-monolith
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_monolith?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&connectionCollation=utf8mb4_unicode_ci
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+jwt:
+  # Тот же самый секрет, что и в других сервисах, чтобы токены работали
+  secret: "veryLongSecretKeyForSmartCityProjectAtLeast256BitsLong1234567890"
+
+logging:
+  level:
+    com.example.smartcity: DEBUG
