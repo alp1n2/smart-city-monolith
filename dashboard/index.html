@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Умный город — демонстрация</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: #f0f2f5;
+            color: #1c1e21;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 24px 32px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        header h1 { font-size: 24px; margin-bottom: 4px; }
+        header p  { opacity: 0.85; font-size: 14px; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-top: 4px solid #2a5298;
+        }
+
+        .card h2 {
+            font-size: 16px;
+            margin-bottom: 4px;
+            color: #2a5298;
+        }
+
+        .card .port {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 16px;
+        }
+
+        .form-group { margin-bottom: 12px; }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
+        button {
+            background: #2a5298;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        button:hover { background: #1e3c72; }
+        button:disabled { background: #aaa; cursor: not-allowed; }
+
+        .result {
+            margin-top: 14px;
+            padding: 10px 12px;
+            background: #f7f9fc;
+            border-radius: 6px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12px;
+            max-height: 240px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            color: #333;
+            border-left: 3px solid #ccc;
+        }
+
+        .result.ok    { border-left-color: #28a745; background: #f0f9f4; }
+        .result.error { border-left-color: #dc3545; background: #fdf2f3; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .status-badge.online  { background: #d4edda; color: #155724; }
+        .status-badge.offline { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1> Умный город — панель управления</h1>
+    <p>Демонстрация работы 6 микросервисов через REST API</p>
+</header>
+
+<div style="margin-bottom: 20px; background: white; padding: 16px 20px; border-radius: 12px;">
+    <label style="font-size: 13px;">JWT-токен (получите через «Войти» в Identity)</label>
+    <input id="globalToken" placeholder="eyJhbGciOiJIUzI1NiJ9..." style="margin-top: 6px;">
+</div>
+
+<div class="grid">
+
+    <!-- IDENTITY -->
+    <div class="card">
+        <h2>1. Identity & Auth <span id="status-identity" class="status-badge">?</span></h2>
+        <div class="port">localhost:8081 · db_identity</div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input id="identity-email" value="test@example.com">
+        </div>
+        <div class="form-group">
+            <label>Пароль</label>
+            <input id="identity-password" type="password" value="secret123">
+        </div>
+        <div class="form-group">
+            <label>ФИО (для регистрации)</label>
+            <input id="identity-fullname" value="Иван Иванов">
+        </div>
+
+        <button onclick="identityLogin()">Войти</button>
+        <button onclick="identityRegister()" style="margin-top: 8px; background: #6c757d;">Зарегистрировать</button>
+        <button onclick="identityGetUsers()" style="margin-top: 8px; background: #6c757d;">Список пользователей</button>
+
+        <div id="result-identity" class="result"></div>
+    </div>
+
+    <!-- TRANSPORT -->
+    <div class="card">
+        <h2>2. Transport <span id="status-transport" class="status-badge">?</span></h2>
+        <div class="port">localhost:8082 · db_transport</div>
+
+        <button onclick="transportVehicles()">Список транспорта</button>
+        <button onclick="transportParking()" style="margin-top: 8px; background: #6c757d;">Список парковок</button>
+
+        <div class="form-group" style="margin-top: 14px;">
+            <label>ID парковки (для брони)</label>
+            <input id="transport-parking-id" value="1">
+        </div>
+        <div class="form-group">
+            <label>Номер авто</label>
+            <input id="transport-vehicle-number" value="A123BC">
+        </div>
+
+        <button onclick="transportReserve()" style="background: #6c757d;">Забронировать</button>
+
+        <div id="result-transport" class="result"></div>
+    </div>
+
+    <!-- UTILITY -->
+    <div class="card">
+        <h2>3. Utility <span id="status-utility" class="status-badge">?</span></h2>
+        <div class="port">localhost:8083 · db_utility</div>
+
+        <div class="form-group">
+            <label>Категория</label>
+            <select id="utility-category">
+                <option value="WATER">WATER</option>
+                <option value="ELECTRICITY">ELECTRICITY</option>
+                <option value="HEATING">HEATING</option>
+                <option value="ROADS">ROADS</option>
+                <option value="OTHER">OTHER</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Заголовок</label>
+            <input id="utility-title" value="Прорыв трубы">
+        </div>
+        <div class="form-group">
+            <label>Адрес</label>
+            <input id="utility-address" value="ул. Ленина, 5">
+        </div>
+        <div class="form-group">
+            <label>Приоритет</label>
+            <select id="utility-priority">
+                <option value="LOW">LOW</option>
+                <option value="MEDIUM" selected>MEDIUM</option>
+                <option value="HIGH">HIGH</option>
+            </select>
+        </div>
+
+        <button onclick="utilityCreate()">Создать заявку</button>
+        <button onclick="utilityList()" style="margin-top: 8px; background: #6c757d;">Список заявок</button>
+
+        <div id="result-utility" class="result"></div>
+    </div>
+
+    <!-- ENVIRONMENT -->
+    <div class="card">
+        <h2>4. Environment <span id="status-environment" class="status-badge">?</span></h2>
+        <div class="port">localhost:8084 · db_environment</div>
+
+        <button onclick="environmentSensors()">Список датчиков</button>
+
+        <div class="form-group" style="margin-top: 14px;">
+            <label>ID датчика (для данных)</label>
+            <input id="environment-sensor-id" value="1">
+        </div>
+        <button onclick="environmentSensorData()" style="background: #6c757d;">Данные датчика</button>
+
+        <div class="form-group" style="margin-top: 14px;">
+            <label>Значение</label>
+            <input id="environment-value" value="42.5">
+        </div>
+        <div class="form-group">
+            <label>Единица</label>
+            <input id="environment-unit" value="AQI">
+        </div>
+        <button onclick="environmentIngest()" style="background: #6c757d;">Отправить данные</button>
+
+        <div id="result-environment" class="result"></div>
+    </div>
+
+    <!-- BILLING -->
+    <div class="card">
+        <h2>5. Billing & Payment <span id="status-billing" class="status-badge">?</span></h2>
+        <div class="port">localhost:8085 · db_billing</div>
+
+        <div class="form-group">
+            <label>ID пользователя</label>
+            <input id="billing-user-id" value="1">
+        </div>
+        <button onclick="billingInvoices()">Счета пользователя</button>
+
+        <button onclick="billingCreateInvoice()" style="background: #17a2b8; margin-bottom: 14px;">Создать новый счёт</button>
+
+        <div class="form-group">
+            <label>ID счёта</label>
+            <input id="billing-invoice-id" value="1">
+        </div>
+        <div class="form-group">
+            <label>Сумма</label>
+            <input id="billing-amount" value="1500.00">
+        </div>
+        <div class="form-group">
+            <label>Метод</label>
+            <select id="billing-method">
+                <option value="CARD">CARD</option>
+                <option value="SBP">SBP</option>
+                <option value="WALLET">WALLET</option>
+            </select>
+        </div>
+        <button onclick="billingCreatePayment()">Создать платёж</button>
+
+        <div class="form-group" style="margin-top: 14px;">
+            <label>Transaction ID (из ответа выше)</label>
+            <input id="billing-transaction-id">
+        </div>
+        <button onclick="billingWebhook()" style="background: #28a745;">Webhook: платёж прошёл</button>
+
+        <div id="result-billing" class="result"></div>
+    </div>
+
+    <!-- NOTIFICATION -->
+    <div class="card">
+        <h2>6. Notification <span id="status-notification" class="status-badge">?</span></h2>
+        <div class="port">localhost:8086 · db_notification</div>
+
+        <div class="form-group">
+            <label>ID пользователя</label>
+            <input id="notification-user-id" value="1">
+        </div>
+        <div class="form-group">
+            <label>Канал</label>
+            <select id="notification-channel">
+                <option value="EMAIL">EMAIL</option>
+                <option value="SMS">SMS</option>
+                <option value="PUSH">PUSH</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Тема</label>
+            <input id="notification-subject" value="Тест">
+        </div>
+        <div class="form-group">
+            <label>Сообщение</label>
+            <textarea id="notification-message" rows="2">Привет из Notification</textarea>
+        </div>
+        <div class="form-group">
+            <label>Источник</label>
+            <input id="notification-source" value="DASHBOARD">
+        </div>
+
+        <button onclick="notificationSend()">Отправить уведомление</button>
+
+        <div id="result-notification" class="result"></div>
+    </div>
+
+</div>
+
+<script>
+    const SERVICES = {
+        identity:     'http://localhost:8081',
+        transport:    'http://localhost:8082',
+        utility:      'http://localhost:8083',
+        environment:  'http://localhost:8084',
+        billing:      'http://localhost:8085',
+        notification: 'http://localhost:8086',
+    };
+
+    const tokenInput = document.getElementById('globalToken');
+    tokenInput.value = localStorage.getItem('jwt') || '';
+    tokenInput.addEventListener('input', () => localStorage.setItem('jwt', tokenInput.value));
+
+    function show(service, data, isError = false) {
+        const el = document.getElementById('result-' + service);
+        el.classList.remove('ok', 'error');
+        el.classList.add(isError ? 'error' : 'ok');
+        el.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+    }
+
+    function authHeaders() {
+        const t = tokenInput.value.trim();
+        return t ? { 'Authorization': 'Bearer ' + t } : {};
+    }
+
+    async function call(service, path, method = 'GET', body = null, withAuth = false) {
+        const url = SERVICES[service] + path;
+        const headers = { 'Content-Type': 'application/json' };
+
+        if (withAuth) Object.assign(headers, authHeaders());
+
+        const options = { method, headers };
+        if (body) options.body = JSON.stringify(body);
+
+        try {
+            const res = await fetch(url, options);
+            const text = await res.text();
+            let data;
+            try { data = JSON.parse(text); } catch { data = text; }
+
+            if (!res.ok) {
+                show(service, { status: res.status, error: data }, true);
+                return null;
+            }
+            show(service, data);
+            return data;
+        } catch (err) {
+            show(service, 'Ошибка подключения: ' + err.message, true);
+            return null;
+        }
+    }
+
+    //  IDENTITY
+    async function identityLogin() {
+        const email = document.getElementById('identity-email').value;
+        const password = document.getElementById('identity-password').value;
+        const data = await call('identity', '/auth/login', 'POST', { email, password });
+        if (data && data.token) {
+            tokenInput.value = data.token;
+            localStorage.setItem('jwt', data.token);
+        }
+    }
+
+    async function identityRegister() {
+        const email = document.getElementById('identity-email').value;
+        const password = document.getElementById('identity-password').value;
+        const fullName = document.getElementById('identity-fullname').value;
+        await call('identity', '/auth/register', 'POST', { email, password, fullName });
+    }
+
+    async function identityGetUsers() {
+        await call('identity', '/users', 'GET', null, true);
+    }
+
+    // TRANSPORT
+    async function transportVehicles() {
+        await call('transport', '/vehicles');
+    }
+
+    async function transportParking() {
+        await call('transport', '/parking');
+    }
+
+    async function transportReserve() {
+        const id = document.getElementById('transport-parking-id').value;
+        const vehicleNumber = document.getElementById('transport-vehicle-number').value;
+        const now = new Date();
+        const from = new Date(now.getTime() + 3600_000).toISOString().slice(0, 19);
+        const to   = new Date(now.getTime() + 7200_000).toISOString().slice(0, 19);
+        await call('transport', `/parking/${id}/reserve`, 'POST',
+            { vehicleNumber, reservedFrom: from, reservedTo: to }, true);
+    }
+
+    // UTILITY
+    async function utilityCreate() {
+        const category = document.getElementById('utility-category').value;
+        const title = document.getElementById('utility-title').value;
+        const address = document.getElementById('utility-address').value;
+        const priority = document.getElementById('utility-priority').value;
+        await call('utility', '/issues', 'POST',
+            { category, title, address, priority }, true);
+    }
+
+    async function utilityList() {
+        await call('utility', '/issues');
+    }
+
+    //  ENVIRONMENT
+    async function environmentSensors() {
+        await call('environment', '/sensors');
+    }
+
+    async function environmentSensorData() {
+        const id = document.getElementById('environment-sensor-id').value;
+        await call('environment', `/sensors/${id}/data`);
+    }
+
+    async function environmentIngest() {
+        const sensorId = parseInt(document.getElementById('environment-sensor-id').value);
+        const value = parseFloat(document.getElementById('environment-value').value);
+        const unit = document.getElementById('environment-unit').value;
+        await call('environment', '/sensors/data', 'POST',
+            { sensorId, value, unit }, true);
+    }
+
+    // BILLING
+    async function billingInvoices() {
+        const userId = document.getElementById('billing-user-id').value;
+        await call('billing', `/accounts/${userId}/invoices`);
+    }
+
+    async function billingCreateInvoice() {
+        await call('billing', '/accounts', 'POST', {
+            serviceType: 'UTILITY',
+            amount: 1500.00,
+            description: 'Тестовый счет из дашборда'
+        }, true);
+    }
+
+    async function billingCreatePayment() {
+        const invoiceId = parseInt(document.getElementById('billing-invoice-id').value);
+        const amount = parseFloat(document.getElementById('billing-amount').value);
+        const method = document.getElementById('billing-method').value;
+        const data = await call('billing', '/payments', 'POST',
+            { invoiceId, amount, method }, true);
+        if (data && data.transactionId) {
+            document.getElementById('billing-transaction-id').value = data.transactionId;
+        }
+    }
+
+    async function billingWebhook() {
+        const transactionId = document.getElementById('billing-transaction-id').value;
+        await call('billing', '/payments/webhook/success', 'POST', { transactionId });
+    }
+
+    // NOTIFICATION
+    async function notificationSend() {
+        const userId = parseInt(document.getElementById('notification-user-id').value);
+        const channel = document.getElementById('notification-channel').value;
+        const subject = document.getElementById('notification-subject').value;
+        const message = document.getElementById('notification-message').value;
+        const sourceService = document.getElementById('notification-source').value;
+        await call('notification', '/notifications', 'POST',
+            { userId, channel, subject, message, sourceService });
+    }
+
+    // ПРОВЕРКА СТАТУСА СЕРВИСОВ
+    async function checkStatus(name) {
+        const badge = document.getElementById('status-' + name);
+        try {
+            await fetch(SERVICES[name] + '/', { method: 'GET', mode: 'no-cors' });
+            badge.textContent = 'online';
+            badge.classList.remove('offline');
+            badge.classList.add('online');
+        } catch {
+            badge.textContent = 'offline';
+            badge.classList.remove('online');
+            badge.classList.add('offline');
+        }
+    }
+
+    // При загрузке страницы
+    Object.keys(SERVICES).forEach(checkStatus);
+    // Обновляем статус каждые 10 секунд
+    setInterval(() => Object.keys(SERVICES).forEach(checkStatus), 10000);
+</script>
+
+</body>
+</html>
