@@ -1,0 +1,31 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: identity-service
+
+  datasource:
+    # createDatabaseIfNotExist=true — создаст базу, если её нет
+    url: jdbc:mysql://localhost:3306/db_identity?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      # update — создаёт/обновляет таблицы на основе @Entity
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+jwt:
+  secret: "veryLongSecretKeyForSmartCityProjectAtLeast256BitsLong1234567890"
+  expiration-ms: 86400000
+
+logging:
+  level:
+    ru.smartcity.identity: DEBUG
