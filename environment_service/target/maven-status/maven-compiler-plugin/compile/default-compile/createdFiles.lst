@@ -1,0 +1,16 @@
+com\example\environment_service\entity\SensorData.class
+com\example\environment_service\repository\SensorDataRepository.class
+com\example\environment_service\config\CorsConfig$1.class
+com\example\environment_service\service\SensorService.class
+com\example\environment_service\dto\SensorDataResponse.class
+com\example\environment_service\dto\SensorResponse.class
+com\example\environment_service\config\SecurityConfig.class
+com\example\environment_service\dto\IngestDataRequest.class
+com\example\environment_service\config\GlobalExceptionHandler.class
+com\example\environment_service\config\CorsConfig.class
+com\example\environment_service\entity\Sensor.class
+com\example\environment_service\security\JwtFilter.class
+com\example\environment_service\security\JwtUtil.class
+com\example\environment_service\controller\SensorController.class
+com\example\environment_service\EnvironmentServiceApplication.class
+com\example\environment_service\repository\SensorRepository.class
